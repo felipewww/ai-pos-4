@@ -1,6 +1,6 @@
 import {AnalyzeCommand} from "@/core/domain/commands/analyze.command";
-import {DeterministicUUID} from "@/core/utils/deterministic-uuid";
 import {FilesUtils} from "@/infra/config";
+import {NotFoundError} from "@/core/errors/not-found-error";
 
 class AnalyzeHandler {
     constructor() {
@@ -8,7 +8,10 @@ class AnalyzeHandler {
 
     async run(command: AnalyzeCommand) {
         console.log(command.jobId)
-        const transcribeContent = FilesUtils.readFile(`transcribe-output/${command.jobId}.json`);
+        const transcribeContent = FilesUtils.readFile(`data/upload-success/${command.jobId}.json`);
+        console.log(transcribeContent)
+
+        throw new NotFoundError()
     }
 }
 

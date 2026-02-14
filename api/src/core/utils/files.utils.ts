@@ -12,7 +12,7 @@ export class fUtils {
     }
 
     readFile(sourcePath: string) {
-        return path.join(process.cwd(), sourcePath);
+        return fs.readFileSync(path.join(process.cwd(), sourcePath));
     }
 
     deleteFile(sourcePath: string) {
