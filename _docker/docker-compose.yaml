@@ -8,10 +8,8 @@ services:
     container_name: comprehend-api
     ports:
       - "3000:3000"
-#      - "3020:3020"
     volumes:
       - ../api:/usr/src/app
-    #      - /usr/src/app/node_modules
     environment:
       MONGO_URI: mongodb://admin:secret@mongodb:27017/comprehend-db?authSource=admin
       NODE_ENV: development

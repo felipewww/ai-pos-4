@@ -1,1 +1,1 @@
-console.log('hello world 10!');
+import './infra/bootstrap';
