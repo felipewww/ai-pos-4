@@ -2,6 +2,7 @@ import * as express from "express";
 import {Express, Request, Response} from "express";
 import {transcribeAudioHandler} from "@/application/domain/transcribe-audio.handler";
 import {uploadMiddleware} from "@/infra/middlewares/upload.middleware";
+import {MediaFormat} from "@aws-sdk/client-transcribe";
 
 export class ComprehendController {
     constructor(
@@ -15,7 +16,14 @@ export class ComprehendController {
     }
 
     async postAudio(req: Request, res: Response) {
-        await transcribeAudioHandler.run({file: req.file})
+        const { mimetype, ...rest } = req.file;
+        await transcribeAudioHandler.run({
+            file: req.file
+            // file: {
+            //     ...rest,
+            //     mimetype: mimetype as MediaFormat // force cast multer to aws req
+            // }
+        })
 
         res.send('ok')
     }
