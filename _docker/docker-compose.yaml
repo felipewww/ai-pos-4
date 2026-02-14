@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  comprehend-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: comprehend-api
+    ports:
+      - "3000:3000"
+#      - "3020:3020"
+    volumes:
+      - ../api:/usr/src/app
+    #      - /usr/src/app/node_modules
+    environment:
+      MONGO_URI: mongodb://admin:secret@mongodb:27017/comprehend-db?authSource=admin
+      NODE_ENV: development
+    depends_on:
+      - comprehend-mongo
+    tty: true
+    command: >
+      sh -c "npm install && npm run build && ls && npm run start:dev"
+
+  comprehend-mongo:
+    image: mongo:latest
+    container_name: comprehend-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    volumes:
+      - mongodb_data:/data/db
+
+# Definição do Volume para persistir os dados do MongoDB
+volumes:
+  mongodb_data:

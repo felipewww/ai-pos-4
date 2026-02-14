@@ -1,5 +1,5 @@
 {
-  "name": "lambda-mtr",
+  "name": "fiap-fase-4",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "rm -rf dist/ && tsc",
-    "start:dev": "tsc && tsc --watch --preserveWatchOutput & nodemon dist/handler.js",
+    "start:dev": "tsc --watch --preserveWatchOutput & nodemon dist/main.js",
     "start:prod": "npm run build && node dist/handler"
   },
   "_moduleAliases": {
