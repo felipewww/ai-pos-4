@@ -3,18 +3,21 @@ import * as path from "node:path";
 import {StorageService} from "@/infra/aws/storage.service";
 
 export class fUtils {
-    retries = 3;
-    retryDelay = 2000;
+    retries = 5;
+    retryDelay = 5000;
 
     constructor(
         private readonly storageService: StorageService
     ) {
     }
 
-    deleteFile(sourcePath: string) {
-        const targetPath = path.join(process.cwd(), sourcePath);
+    readFile(sourcePath: string) {
+        return path.join(process.cwd(), sourcePath);
+    }
 
-        if (fs.existsSync(targetPath)) {
+    deleteFile(sourcePath: string) {
+        if (this.exists(sourcePath)) {
+            const targetPath = path.join(process.cwd(), sourcePath);
             fs.unlinkSync(targetPath);
         }
     }
@@ -36,7 +39,8 @@ export class fUtils {
 
     downloadFile(
         objectKey: string,
-        tryCount: number = 0
+        cb: () => any = null,
+        tryCount: number = 0,
     ) {
         if (tryCount >= this.retries) {
             console.log(`Error downloading file ${objectKey}`.red.bold)
@@ -45,9 +49,13 @@ export class fUtils {
 
         setTimeout(() => {
             console.log(`Downloading file ${objectKey} - try ${tryCount}`.yellow.bold)
-            this.storageService.download(objectKey, 'upload-success')
+            this.storageService.download(objectKey, 'data/upload-success')
+                .then(() => {
+                    console.log('Download finished'.green.bold)
+                    if (cb) cb();
+                })
                 .catch(() => {
-                    this.downloadFile(objectKey, tryCount + 1);
+                    this.downloadFile(objectKey, cb, tryCount + 1);
                 })
         }, this.retryDelay)
     }

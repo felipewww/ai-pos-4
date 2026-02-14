@@ -27,7 +27,7 @@ export class StorageService {
         const localFilePath = path.join(process.cwd(), 'uploads', file.filename);
 
         if (
-            FilesUtils.exists(`upload-success/${file.filename}`)
+            FilesUtils.exists(`data/upload-success/${file.filename}`)
         ) {
             console.log(`File ${file.filename} already exists in uploads folder`.yellow.bold)
             FilesUtils.deleteFile(localFilePath);

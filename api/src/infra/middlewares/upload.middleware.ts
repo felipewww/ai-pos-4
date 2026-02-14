@@ -3,7 +3,7 @@ import * as multer from "multer";
 export const uploadMiddleware = multer({
     storage: multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, 'uploads/');
+            cb(null, 'data/uploads/');
         },
         filename: (req, file, cb) => {
             cb(null, `${file.originalname}`);

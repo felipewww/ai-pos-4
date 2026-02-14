@@ -20,11 +20,19 @@ class TranscribeAudioHandler {
             body: fileBuffer,
         });
 
-        this.transcribeService.execute({
+        const {transcribedFilePath, jobId} = this.transcribeService.execute({
             filename: command.file.originalname,
-            mediaFileUri: uploadFileResult.httpsUrl, // normalmente https S3
+            mediaFileUri: uploadFileResult.httpsUrl,
             mediaFormat,
         })
+
+        console.log('transcribedFilePath???'.red.bold)
+        console.log(transcribedFilePath)
+
+        return {
+            id: jobId,
+            // filename: command.file.originalname
+        };
     }
 }
 

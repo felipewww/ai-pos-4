@@ -14,6 +14,7 @@
     "@": "./dist/"
   },
   "dependencies": {
+    "@aws-sdk/client-comprehend": "^3.990.0",
     "@aws-sdk/client-s3": "^3.990.0",
     "@aws-sdk/client-transcribe": "^3.990.0",
     "@aws-sdk/lib-storage": "^3.990.0",
@@ -27,7 +28,8 @@
     "multer": "^2.0.2",
     "nodemon": "^3.1.11",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "tar-stream": "^3.1.7"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.160",
