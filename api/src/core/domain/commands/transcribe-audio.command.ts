@@ -1,3 +1,5 @@
+import {FileType} from "@/core/file.type";
+
 export type TranscribeAudioCommand = {
-    filename: string
+    file: FileType
 }

@@ -1,4 +1,6 @@
 import {S3Client, PutObjectCommand} from "@aws-sdk/client-s3";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 export type UploadFile = {
     keyPrefix?: string;
@@ -16,7 +18,18 @@ export class StorageService {
             region
         });
 
-        const key = `${file.keyPrefix ?? "transcribe-input"}/${Date.now()}-${file.filename}`;
+        const key = `${file.keyPrefix ?? "transcribe-input"}/${file.filename}`;
+        const httpsUrl = `https://${bucket}.s3.${region}.amazonaws.com/${encodeURIComponent(key).replace(/%2F/g, "/")}`;
+        const s3Uri = `s3://${bucket}/${key}`;
+
+        const result = { key, httpsUrl, s3Uri };
+
+        const fileExists = fs.existsSync(path.join(process.cwd(), 'uploads', file.filename));
+
+        if (fileExists) {
+            console.log(`File ${file.filename} already exists in uploads folder`.yellow.bold)
+            return result
+        }
 
         const command = new PutObjectCommand({
             Bucket: bucket,
@@ -27,10 +40,6 @@ export class StorageService {
 
         await s3.send(command);
 
-        // URL "virtual-hosted-style"
-        const httpsUrl = `https://${bucket}.s3.${region}.amazonaws.com/${encodeURIComponent(key).replace(/%2F/g, "/")}`;
-        const s3Uri = `s3://${bucket}/${key}`;
-
-        return { key, httpsUrl, s3Uri };
+        return result
     }
 }
