@@ -4,10 +4,24 @@ import {
     TranscribedRepository
 } from "@/application/data/mongo/repositories/transcribed.repository";
 import {ETranscriptionStatus} from "@/application/data/mongo/models/transcribed.model";
+import {AnalyzeCommand} from "@/core/domain/commands/analyze.command";
+import {StorageService} from "@/infra/aws/storage/storage.service";
+import {storageService} from "@/infra/config";
+import {comprehendService, ComprehendService} from "@/infra/aws/comprehend/comprehend.service";
+
+type Trancripted = {
+    results: {
+        transcripts: {
+            transcript: string
+        }[]
+    }
+}
 
 export class OnTranscribed {
     constructor(
         private readonly transcribedRepository: TranscribedRepository,
+        private readonly storageService: StorageService,
+        private readonly comprehendService: ComprehendService,
     ) {
     }
 
@@ -20,10 +34,36 @@ export class OnTranscribed {
                 id: input.TranscriptionJobName,
                 status: ETranscriptionStatus.COMPLETED,
             })
+
+            await this.saveToComprehend(input.TranscriptionJobName)
+
+            await this.comprehendService.startClassificationJob({
+                jobId: input.TranscriptionJobName,
+                inputS3Uri: `${process.env.S3_URI}/comprehend-input/${input.TranscriptionJobName}.txt`,
+                outputS3Uri: `${process.env.S3_URI}/comprehend-output/jobs/${input.TranscriptionJobName}/`,
+            })
         }
+    }
+
+    private async saveToComprehend(jobId: string) {
+        const fileContent = await this.storageService.read(
+            `transcribe-output/${jobId}.json`
+        );
+
+        const data = JSON.parse(fileContent) as Trancripted
+        const transcriptText = data.results.transcripts[0].transcript;
+
+        await this.storageService.upload({
+            folder: 'comprehend-input/',
+            filename: `${jobId}.txt`,
+            contentType: "text/plain; charset=utf-8",
+            body: transcriptText,
+        })
     }
 }
 
 export const onTranscribed = new OnTranscribed(
-    transcribedRepository
+    transcribedRepository,
+    storageService,
+    comprehendService,
 );

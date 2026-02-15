@@ -12,7 +12,7 @@ export class ComprehendController {
     ) {
         const router = express.Router();
 
-        router.post('/transcribe', uploadMiddleware.single('file'), this.postAudio)
+        router.post('/', uploadMiddleware.single('file'), this.postAudio)
         router.get('/:jobId', uploadMiddleware.single('file'), this.getComprehend)
         router.post('/:jobId/analyze', uploadMiddleware.single('file'), this.forceComprehend)
 

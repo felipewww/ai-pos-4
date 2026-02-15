@@ -11,13 +11,13 @@ import {JobStatus} from "@aws-sdk/client-comprehend";
 import {ComprehendJobStatus} from "@/core/domain/types/comprehend/comprehend-job-status";
 import {Defaults} from "@/core/defaults";
 
-type Trancripted = {
-    results: {
-        transcripts: {
-            transcript: string
-        }[]
-    }
-}
+// type Trancripted = {
+//     results: {
+//         transcripts: {
+//             transcript: string
+//         }[]
+//     }
+// }
 
 class AnalyzeHandler {
     constructor(
@@ -42,7 +42,7 @@ class AnalyzeHandler {
 
             if (comprehendJob.status === ComprehendJobStatus.NOT_FOUND) {
 
-                await this.saveToComprehend(command);
+                // await this.saveToComprehend(command);
 
                 await this.comprehendService.startClassificationJob({
                     jobId: command.jobId,
@@ -64,21 +64,21 @@ class AnalyzeHandler {
         // throw new NotFoundError()
     }
 
-    private async saveToComprehend(command: AnalyzeCommand) {
-        const fileContent = await this.storageService.read(
-            `transcribe-output/${command.jobId}.json`
-        );
-
-        const data = JSON.parse(fileContent) as Trancripted
-        const transcriptText = data.results.transcripts[0].transcript;
-
-        await this.storageService.upload({
-            folder: 'comprehend-input/',
-            filename: `${command.jobId}.txt`,
-            contentType: "text/plain; charset=utf-8",
-            body: transcriptText,
-        })
-    }
+    // private async saveToComprehend(command: AnalyzeCommand) {
+    //     const fileContent = await this.storageService.read(
+    //         `transcribe-output/${command.jobId}.json`
+    //     );
+    //
+    //     const data = JSON.parse(fileContent) as Trancripted
+    //     const transcriptText = data.results.transcripts[0].transcript;
+    //
+    //     await this.storageService.upload({
+    //         folder: 'comprehend-input/',
+    //         filename: `${command.jobId}.txt`,
+    //         contentType: "text/plain; charset=utf-8",
+    //         body: transcriptText,
+    //     })
+    // }
 }
 
 export const analyzeHandler = new AnalyzeHandler(
