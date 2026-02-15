@@ -9,11 +9,13 @@ import {
     TranscribedRepository
 } from "@/application/data/mongo/repositories/transcribed.repository";
 import {ETranscriptionStatus, Predictions} from "@/application/data/mongo/models/transcribed.model";
+import {riskEngineService, RiskEngineService} from "@/infra/services/risk-engine/risk-engine.service";
 
 export class OnComprehend {
     constructor(
         private readonly storageService: StorageService,
         private readonly transcribedRepository: TranscribedRepository,
+        private readonly riskEngineService: RiskEngineService
     ) {
     }
 
@@ -41,6 +43,10 @@ export class OnComprehend {
                 predictions,
             })
 
+            const risk = await this.riskEngineService.predictRisk(predictions)
+            console.log('\n--')
+            console.log(risk)
+            console.log('\n--')
             console.log(predictions)
         }
     }
@@ -79,6 +85,7 @@ export class OnComprehend {
 export const onComprehend = new OnComprehend(
     storageService,
     transcribedRepository,
+    riskEngineService,
 );
 
 setTimeout(() => {

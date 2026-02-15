@@ -1,5 +1,31 @@
 import mongoose, {Model, Schema} from "mongoose";
 
+export type Risk = {
+    riskLevel: 'URGENTE'|'ROTINA'|'MONITORAR',
+    confidence: number,
+    probabilities: {
+          MONITORAR: number,
+          ROTINA: number,
+          URGENTE: number,
+        },
+    humanReviewRequired: true,
+    topSignals: {label: string, score: number}[],
+    features: {
+          risco_violencia_domestica: number,
+          isolamento_social: number,
+          dor_de_cabeca_frequente: number,
+          aperto_no_peito: number,
+          dor_muscular: number,
+          alteracao_do_aparelho_respiratorio: number,
+          alteracao_do_aparelho_cardiovascular: number,
+          alteracao_do_aparelho_digestivo: number,
+          alteracao_do_aparelho_reprodutor: number,
+          fadiga_persistente: number,
+          sintoma_hormonal: number,
+        }
+}
+
+
 export type Predictions = {
     Labels: {
         Name: string,
