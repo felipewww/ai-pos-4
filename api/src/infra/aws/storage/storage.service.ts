@@ -97,7 +97,10 @@ export class StorageService {
             Key: objectKey
         });
 
-        return this.client.send(command);
+        const response = await this.client.send(command);
+        const body = response.Body;
+
+        return body
     }
 
     public async read(objectKey: string): Promise<any> {

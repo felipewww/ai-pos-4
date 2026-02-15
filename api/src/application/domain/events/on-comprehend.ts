@@ -28,11 +28,12 @@ export class OnComprehend {
             }
 
             const gzStream = await this.storageService.readTgz(tarGzKey);
+            // const gzStream = await this.storageService.read(tarGzKey);
 
-            console.log(gzStream)
-            // const jsonl = await this.extractFileFromTarGz(gzStream, "predictions.jsonl");
+            // console.log(gzStream)
+            const jsonl = await this.extractFileFromTarGz(gzStream, "predictions.jsonl");
 
-            // console.log(jsonl)
+            console.log(jsonl)
 
             // return jsonl;
         }
