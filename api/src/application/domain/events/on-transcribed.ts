@@ -4,11 +4,11 @@ import {
     TranscribedRepository
 } from "@/application/data/mongo/repositories/transcribed.repository";
 import {ETranscriptionStatus} from "@/application/data/mongo/models/transcribed.model";
-import {AnalyzeCommand} from "@/core/domain/commands/analyze.command";
 import {StorageService} from "@/infra/aws/storage/storage.service";
 import {storageService} from "@/infra/config";
 import {comprehendService, ComprehendService} from "@/infra/aws/comprehend/comprehend.service";
 import {Defaults} from "@/core/defaults";
+import {onComprehend} from "@/application/domain/events/on-comprehend";
 
 type Trancripted = {
     results: {
@@ -31,19 +31,43 @@ export class OnTranscribed {
         console.log(input)
 
         if (input.TranscriptionJobStatus === 'COMPLETED') {
+            const fileId = input.TranscriptionJobName;
             await this.transcribedRepository.save({
                 id: input.TranscriptionJobName,
                 status: ETranscriptionStatus.COMPLETED,
             })
 
-            await this.saveToComprehend(input.TranscriptionJobName)
+            await this.saveToComprehend(fileId)
 
-            await this.comprehendService.startClassificationJob({
-                jobId: input.TranscriptionJobName,
-                inputS3Uri: `${Defaults.S3_URI}/comprehend-input/${input.TranscriptionJobName}.txt`,
-                outputS3Uri: `${Defaults.S3_URI}/comprehend-output/${input.TranscriptionJobName}`,
-                // dataAccessRoleArn: process.env.DATA_ACCESS_ROLE_ARN,
+            const comprehendJobSubmitResult = await this.comprehendService.startClassificationJob({
+                jobId: fileId,
+                inputS3Uri: `${Defaults.S3_URI}/comprehend-input/${fileId}.txt`,
+                outputS3Uri: `${Defaults.S3_URI}/comprehend-output/${fileId}`,
             })
+
+            if (
+                comprehendJobSubmitResult.JobStatus === 'FAILED'
+                || comprehendJobSubmitResult.JobStatus === 'STOPPED'
+                || comprehendJobSubmitResult.JobStatus === 'STOP_REQUESTED'
+            ) {
+                await this.transcribedRepository.save({
+                    id: input.TranscriptionJobName,
+                    status: ETranscriptionStatus.COMPREHEND_SUBMIT_FAILED,
+                    comprehendJobId: comprehendJobSubmitResult.JobId,
+                })
+            } else {
+                await this.transcribedRepository.save({
+                    id: input.TranscriptionJobName,
+                    status: ETranscriptionStatus.COMPREHEND_SUBMITTED,
+                    comprehendJobId: comprehendJobSubmitResult.JobId,
+                })
+
+                this.comprehendService.watchJobStatus(
+                    comprehendJobSubmitResult.JobId,
+                    fileId,
+                    onComprehend.run,
+                )
+            }
         }
     }
 

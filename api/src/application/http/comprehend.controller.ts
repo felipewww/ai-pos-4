@@ -14,7 +14,7 @@ export class ComprehendController {
 
         router.post('/', uploadMiddleware.single('file'), this.postAudio)
         router.get('/:jobId', uploadMiddleware.single('file'), this.getComprehend)
-        router.post('/:jobId/analyze', uploadMiddleware.single('file'), this.forceComprehend)
+        // router.post('/:jobId/analyze', uploadMiddleware.single('file'), this.forceComprehend)
 
         this.app.use('/comprehend', router)
     }
@@ -36,11 +36,11 @@ export class ComprehendController {
         res.json(result)
     }
 
-    async forceComprehend(req: Request, res: Response) {
-        const result = await analyzeHandler.run({
-            jobId: req.params.jobId as string
-        })
-
-        res.json(result)
-    }
+    // async forceComprehend(req: Request, res: Response) {
+    //     const result = await analyzeHandler.run({
+    //         jobId: req.params.jobId as string
+    //     })
+    //
+    //     res.json(result)
+    // }
 }

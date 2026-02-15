@@ -7,7 +7,7 @@ import {
     TranscribedRepository
 } from "@/application/data/mongo/repositories/transcribed.repository";
 import * as fs from 'fs/promises';
-import {FilesUtils} from "@/infra/config";
+import {FilesUtils, storageService, transcribeService} from "@/infra/config";
 import {ETranscriptionStatus} from "@/application/data/mongo/models/transcribed.model";
 
 class TranscribeAudioHandler {
@@ -56,7 +56,7 @@ class TranscribeAudioHandler {
 }
 
 export const transcribeAudioHandler = new TranscribeAudioHandler(
-    new StorageService(),
-    new TranscribeService(),
+    storageService,
+    transcribeService,
     transcribedRepository,
 )

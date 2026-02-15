@@ -1,4 +1,4 @@
-import {S3Client, PutObjectCommand, GetObjectCommand} from "@aws-sdk/client-s3";
+import {S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command} from "@aws-sdk/client-s3";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import {UploadFileCommand} from "@/infra/aws/commands/upload-file.command";
@@ -6,7 +6,6 @@ import {UploadFileResult} from "@/infra/aws/commands/upload-file.result";
 import {Readable} from "node:stream";
 import {FilesUtils} from "@/infra/config";
 import {Defaults} from "@/core/defaults";
-// import {FilesUtils} from "@/core/utils/files.utils";
 
 export class StorageService {
     private client: S3Client;
@@ -92,13 +91,18 @@ export class StorageService {
         return localFilePath;
     }
 
+    public async readTgz(objectKey: string): Promise<any> {
+        const command = new GetObjectCommand({
+            Bucket: process.env.S3_BUCKET,
+            Key: objectKey
+        });
+
+        return this.client.send(command);
+    }
+
     public async read(objectKey: string): Promise<any> {
         return new Promise(async (resolve, reject) => {
             const content = []
-            // const bucket = process.env.S3_BUCKET;
-
-            // const s3 = new S3Client();
-            // const s3 = new S3Client({ region });
 
             const command = new GetObjectCommand({
                 Bucket: process.env.S3_BUCKET,
@@ -110,26 +114,18 @@ export class StorageService {
                 const body = response.Body;
 
                 if (body instanceof Readable) {
-                    // Process each chunk of data here (e.g., parse a line, count bytes)
                     body.on('data', (chunk) => {
-                        // console.log(chunk.toString());
-                        // console.log(`Received chunk of size: ${chunk.length}`);
                         content.push(chunk.toString());
                     });
 
                     body.on('end', () => {
-                        // console.log('Stream finished.');
                         resolve(content.join(''));
                     });
 
                     body.on('error', (err) => {
-                        // console.error('Stream error:', err);
                         reject(err);
                     });
                 } else {
-                    // Handle the case where Body might not be a Readable stream (e.g., in a browser environment)
-                    // const str = await (body as any).transformToString(); // Use transformToString for the browser
-                    // console.log('Object content:', str);
                     reject('Body is not a Readable stream')
                 }
 
@@ -138,6 +134,34 @@ export class StorageService {
                 reject(err);
             }
         })
-        // const region = process.env.AWS_REGION;
+    }
+
+    public async findFile(
+        filename: string, //"output.tar.gz"
+        folder: string,
+    ) {
+        const bucket = process.env.S3_BUCKET;
+
+        console.log(`Searching for ${filename} in ${folder}`)
+
+        let ContinuationToken: string | undefined = undefined;
+        do {
+            const resp = await this.client.send(
+                new ListObjectsV2Command({
+                    Bucket: bucket,
+                    Prefix: folder,
+                    ContinuationToken,
+                })
+            );
+
+            // console.log(resp)
+
+            const match = (resp.Contents ?? []).find((o) => o.Key?.endsWith(filename));
+            if (match?.Key) return match.Key;
+            ContinuationToken = resp.NextContinuationToken;
+            // console.log(`ContinuationToken: ${ContinuationToken}`)
+        } while (ContinuationToken);
+
+        return null;
     }
 }

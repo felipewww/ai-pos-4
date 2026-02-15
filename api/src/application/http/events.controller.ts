@@ -26,10 +26,10 @@ export class EventsController {
                     .catch(console.error)
                 break;
 
-            case "aws.comprehend":
-                onComprehend.run(body.detail)
-                    .catch(console.error)
-                break;
+            // case "aws.comprehend":
+            //     onComprehend.run(body.detail)
+            //         .catch(console.error)
+            //     break;
 
             default:
                 console.log('unknown event received'.red.bold)
