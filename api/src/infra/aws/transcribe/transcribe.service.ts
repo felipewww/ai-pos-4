@@ -7,7 +7,7 @@ import {DeterministicUUID} from "@/core/utils/deterministic-uuid";
 import * as path from "node:path";
 import * as fs from "node:fs";
 import {FilesUtils} from "@/infra/config";
-import {analyzeHandler} from "@/application/domain/analyze.handler";
+import {analyzeHandler} from "@/application/domain/handlers/analyze.handler";
 
 export class TranscribeService {
     async execute(command: TranscribeObjectCommand) {

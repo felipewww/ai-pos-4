@@ -1,10 +1,10 @@
 import * as express from "express";
 import {Express, Request, Response} from "express";
-import {transcribeAudioHandler} from "@/application/domain/transcribe-audio.handler";
+import {transcribeAudioHandler} from "@/application/domain/handlers/transcribe-audio.handler";
 import {uploadMiddleware} from "@/infra/middlewares/upload.middleware";
 import {MediaFormat} from "@aws-sdk/client-transcribe";
-import {searchComprehendHandler} from "@/application/domain/search-comprehend.handler";
-import {analyzeHandler} from "@/application/domain/analyze.handler";
+import {searchComprehendHandler} from "@/application/domain/handlers/search-comprehend.handler";
+import {analyzeHandler} from "@/application/domain/handlers/analyze.handler";
 
 export class ComprehendController {
     constructor(
