@@ -8,7 +8,7 @@ import {
     transcribedRepository,
     TranscribedRepository
 } from "@/application/data/mongo/repositories/transcribed.repository";
-import {ETranscriptionStatus} from "@/application/data/mongo/models/transcribed.model";
+import {ETranscriptionStatus, Predictions} from "@/application/data/mongo/models/transcribed.model";
 
 export class OnComprehend {
     constructor(
@@ -21,7 +21,6 @@ export class OnComprehend {
         console.log('on comprehend received'.green.bold)
         console.log(input)
         if (input.status === 'COMPLETED') {
-            // const tarGzKey = await this.findOutputTarGzKey(this.cfg.bucket, outputPrefix);
             const tarGzKey = await this.storageService.findFile("output.tar.gz", `comprehend-output/${transcribeJobId}/`);
 
             if (!tarGzKey) {
@@ -34,7 +33,7 @@ export class OnComprehend {
             const gzStream = await this.storageService.readTgz(tarGzKey);
             const jsonl = await this.extractFileFromTarGz(gzStream, "predictions.jsonl");
 
-            const predictions = JSON.parse(jsonl)
+            const predictions = JSON.parse(jsonl) as Predictions
 
             await this.transcribedRepository.save({
                 id: transcribeJobId,

@@ -1,0 +1,5 @@
+.idea
+.venv
+log-ai/src/__pycache__/*
+**/__pycache__/*
+models/*.joblib
