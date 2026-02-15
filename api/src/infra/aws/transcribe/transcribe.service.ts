@@ -10,7 +10,7 @@ import {FilesUtils} from "@/infra/config";
 import {analyzeHandler} from "@/application/domain/analyze.handler";
 
 export class TranscribeService {
-    execute(command: TranscribeObjectCommand) {
+    async execute(command: TranscribeObjectCommand) {
         const region = process.env.AWS_REGION;
         const bucket = process.env.S3_BUCKET;
 
@@ -25,13 +25,13 @@ export class TranscribeService {
 
         const result = { transcribedFilePath, jobId }
 
-        if (FilesUtils.exists(transcribedFilePath)) {
-            console.log(`File ${command.filename} already exists in uploads directory. Should not transcribe again`.yellow.bold);
-            return result;
-        }
+        // if (FilesUtils.exists(transcribedFilePath)) {
+        //     console.log(`File ${command.filename} already exists in uploads directory. Should not transcribe again`.yellow.bold);
+        //     return result;
+        // }
 
         const cmd = new StartTranscriptionJobCommand({
-            TranscriptionJobName: command.filename,
+            TranscriptionJobName: jobId,
             LanguageCode: "pt-BR",
             MediaFormat: command.mediaFormat,
             Media: {
@@ -48,27 +48,7 @@ export class TranscribeService {
             },
         });
 
-        transcribe.send(cmd)
-            .then((response) => {
-                console.log('transcribed successfully!'.green.bold)
-
-                FilesUtils.deleteFile(`data/uploads/${command.filename}`)
-                // FilesUtils.moveFile(
-                //     `data/uploads/${command.filename}`,
-                //     transcribedFilePath
-                // )
-
-                // FilesUtils.downloadFile(
-                //     OutputKey,
-                //     () => analyzeHandler.run({
-                //         jobId,
-                //     })
-                // );
-            })
-            .catch((err) => {
-                console.log(`${jobId} error`)
-                console.log(err);
-            })
+        await transcribe.send(cmd)
 
         return result;
     }
