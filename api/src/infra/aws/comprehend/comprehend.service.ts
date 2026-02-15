@@ -42,9 +42,12 @@ export class ComprehendService {
                 ) {
                     setTimeout(() => {
                         this.watchJobStatus(comprehendJobId, transcribeJobId, cb, tries + 1)
-                    }, 5000)
+                    }, 10000)
                 } else {
-                    cb(job, transcribeJobId)
+                    // aguardar o arquivo ser copiado para o S3
+                    setTimeout(() => {
+                        cb(job, transcribeJobId)
+                    }, 2000)
                 }
             })
             .catch(console.error)

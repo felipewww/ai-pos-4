@@ -43,9 +43,16 @@ export class OnComprehend {
                 predictions,
             })
 
-            const risk = await this.riskEngineService.predictRisk(predictions)
+            const riskResult = await this.riskEngineService.predictRisk(predictions)
+
+            await this.transcribedRepository.save({
+                id: transcribeJobId,
+                status: ETranscriptionStatus.RISK_ANALYSIS_COMPLETED,
+                risk: riskResult.data,
+            })
+
             console.log('\n--')
-            console.log(risk)
+            console.log(riskResult.data)
             console.log('\n--')
             console.log(predictions)
         }
@@ -95,7 +102,6 @@ setTimeout(() => {
         message: 'string',
         outputDataConfig: null,
         inputDataConfig: null,
-    }, 'F40A-18BC-41C2-7A53')
+    }, '89B3-12D8-2A6C-A7AE')
         .catch(console.error)
-
 }, 2000)

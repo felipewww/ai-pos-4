@@ -39,6 +39,7 @@ export enum ETranscriptionStatus {
     COMPREHEND_SUBMITTED = 'COMPREHEND_SUBMITTED',
     COMPREHEND_SUBMIT_FAILED = 'COMPREHEND_SUBMIT_FAILED',
     COMPREHEND_COMPLETED = 'COMPREHEND_COMPLETED',
+    RISK_ANALYSIS_COMPLETED = 'RISK_ANALYSIS_COMPLETED'
 }
 
 export interface ITranscribedModel {
@@ -48,6 +49,7 @@ export interface ITranscribedModel {
     status: ETranscriptionStatus;
     comprehendJobId: string;
     predictions: Predictions;
+    risk: Risk;
     content: string;
 }
 
@@ -59,6 +61,7 @@ const transcribedSchema: Schema = new Schema(
         status: { type: String, required: true },
         comprehendJobId: { type: String, required: false, nullable: true },
         predictions: { type: Object, required: false, nullable: true },
+        risk: { type: Object, required: false, nullable: true },
         content: { type: String, required: false, nullable: true }
     },
     { timestamps: true }
