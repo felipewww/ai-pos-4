@@ -40,6 +40,8 @@ class TranscribeAudioHandler {
                 path: transcribedFilePath,
                 filename: command.file.originalname,
                 status: ETranscriptionStatus.PROCESSING,
+                comprehendJobId: null,
+                predictions: null,
                 content: null
             })
 

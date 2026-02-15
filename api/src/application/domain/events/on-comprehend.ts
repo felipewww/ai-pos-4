@@ -4,12 +4,16 @@ import {storageService} from "@/infra/config";
 import {Readable} from "stream";
 import * as zlib from "zlib";
 import * as tar from "tar-stream";
-import {ComprehendJobStatus} from "@/core/domain/types/comprehend/comprehend-job-status";
-import {InputDataConfig, OutputDataConfig} from "@aws-sdk/client-comprehend";
+import {
+    transcribedRepository,
+    TranscribedRepository
+} from "@/application/data/mongo/repositories/transcribed.repository";
+import {ETranscriptionStatus} from "@/application/data/mongo/models/transcribed.model";
 
 export class OnComprehend {
     constructor(
         private readonly storageService: StorageService,
+        private readonly transcribedRepository: TranscribedRepository,
     ) {
     }
 
@@ -28,14 +32,17 @@ export class OnComprehend {
             }
 
             const gzStream = await this.storageService.readTgz(tarGzKey);
-            // const gzStream = await this.storageService.read(tarGzKey);
-
-            // console.log(gzStream)
             const jsonl = await this.extractFileFromTarGz(gzStream, "predictions.jsonl");
 
-            console.log(jsonl)
+            const predictions = JSON.parse(jsonl)
 
-            // return jsonl;
+            await this.transcribedRepository.save({
+                id: transcribeJobId,
+                status: ETranscriptionStatus.COMPREHEND_COMPLETED,
+                predictions,
+            })
+
+            console.log(predictions)
         }
     }
 
@@ -71,11 +78,11 @@ export class OnComprehend {
 }
 
 export const onComprehend = new OnComprehend(
-    storageService
+    storageService,
+    transcribedRepository,
 );
 
 setTimeout(() => {
-
     onComprehend.run({
         jobId: 'wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww',
         status: 'COMPLETED',
