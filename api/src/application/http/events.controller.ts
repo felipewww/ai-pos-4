@@ -3,6 +3,7 @@ import * as express from "express";
 import {TranscribeEventInput} from "@/application/http/inputs/transcribe-event-input";
 import {EventBridge} from "@/application/http/inputs/event-bridge";
 import {onTranscribed} from "@/application/domain/events/on-transcribed";
+import {onComprehend} from "@/application/domain/events/on-comprehend";
 
 export class EventsController {
     constructor(
@@ -19,10 +20,20 @@ export class EventsController {
         console.log('event received!'.green.bold)
         const body = req.body as EventBridge<any>
 
-        if (body.source === 'aws.transcribe') {
-            const detail = body.detail as TranscribeEventInput
-            onTranscribed.run(detail)
-                .catch(console.error)
+        switch (body.source) {
+            case 'aws.transcribe':
+                onTranscribed.run(body.detail)
+                    .catch(console.error)
+                break;
+
+            case "aws.comprehend":
+                onComprehend.run(body.detail)
+                    .catch(console.error)
+                break;
+
+            default:
+                console.log('unknown event received'.red.bold)
+                console.log(body)
         }
 
         res.json({status: true});

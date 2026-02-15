@@ -166,21 +166,22 @@ export class ComprehendService {
             InputFormat: "ONE_DOC_PER_LINE", // cada linha = 1 doc :contentReference[oaicite:4]{index=4}
         };
 
-        const outputDataConfig: DocumentClassifierOutputDataConfig = {
+        const outputDataConfig = {
             S3Uri: args.outputS3Uri, // prefix; Comprehend cria diretório do job e output.tar.gz :contentReference[oaicite:5]{index=5}
         };
 
+        console.log(`sending job ${args.jobId} to comprehend`.green.bold)
         await this.comprehend.send(
+
             new StartDocumentClassificationJobCommand({
                 JobName: `${args.jobId}`,
                 DocumentClassifierArn: process.env.COMPREHEND_CLASSIFIER_ARN,
-                // DataAccessRoleArn: this.cfg.dataAccessRoleArn,
+                DataAccessRoleArn: process.env.COMPREHEND_ROLE_ARN,
                 InputDataConfig: inputDataConfig,
-                // @ts-ignore
                 OutputDataConfig: outputDataConfig,
-
             })
         );
+        console.log(`job received successfully by comprehend!`.green.bold)
     }
 
     // private async extractTranscriptFromTranscribeJson(bucket: string, key: string): Promise<string> {

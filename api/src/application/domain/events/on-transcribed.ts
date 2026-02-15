@@ -8,6 +8,7 @@ import {AnalyzeCommand} from "@/core/domain/commands/analyze.command";
 import {StorageService} from "@/infra/aws/storage/storage.service";
 import {storageService} from "@/infra/config";
 import {comprehendService, ComprehendService} from "@/infra/aws/comprehend/comprehend.service";
+import {Defaults} from "@/core/defaults";
 
 type Trancripted = {
     results: {
@@ -39,8 +40,9 @@ export class OnTranscribed {
 
             await this.comprehendService.startClassificationJob({
                 jobId: input.TranscriptionJobName,
-                inputS3Uri: `${process.env.S3_URI}/comprehend-input/${input.TranscriptionJobName}.txt`,
-                outputS3Uri: `${process.env.S3_URI}/comprehend-output/jobs/${input.TranscriptionJobName}/`,
+                inputS3Uri: `${Defaults.S3_URI}/comprehend-input/${input.TranscriptionJobName}.txt`,
+                outputS3Uri: `${Defaults.S3_URI}/comprehend-output/${input.TranscriptionJobName}`,
+                // dataAccessRoleArn: process.env.DATA_ACCESS_ROLE_ARN,
             })
         }
     }
