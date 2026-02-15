@@ -52,17 +52,18 @@ export class TranscribeService {
             .then((response) => {
                 console.log('transcribed successfully!'.green.bold)
 
-                FilesUtils.moveFile(
-                    `data/uploads/${command.filename}`,
-                    transcribedFilePath
-                )
+                FilesUtils.deleteFile(`data/uploads/${command.filename}`)
+                // FilesUtils.moveFile(
+                //     `data/uploads/${command.filename}`,
+                //     transcribedFilePath
+                // )
 
-                FilesUtils.downloadFile(
-                    OutputKey,
-                    () => analyzeHandler.run({
-                        jobId,
-                    })
-                );
+                // FilesUtils.downloadFile(
+                //     OutputKey,
+                //     () => analyzeHandler.run({
+                //         jobId,
+                //     })
+                // );
             })
             .catch((err) => {
                 console.log(`${jobId} error`)

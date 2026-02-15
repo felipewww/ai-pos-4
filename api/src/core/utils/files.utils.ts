@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import {StorageService} from "@/infra/aws/storage.service";
+import {StorageService} from "@/infra/aws/storage/storage.service";
 
 export class fUtils {
     retries = 5;
@@ -12,7 +12,7 @@ export class fUtils {
     }
 
     readFile(sourcePath: string) {
-        return fs.readFileSync(path.join(process.cwd(), sourcePath));
+        return fs.readFileSync(path.join(process.cwd(), sourcePath), 'utf-8');
     }
 
     deleteFile(sourcePath: string) {

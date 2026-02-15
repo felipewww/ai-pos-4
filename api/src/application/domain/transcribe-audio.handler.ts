@@ -1,6 +1,6 @@
 import {TranscribeAudioCommand} from "@/core/domain/commands/transcribe-audio.command";
-import {StorageService} from "@/infra/aws/storage.service";
-import {TranscribeService} from "@/infra/aws/transcribe.service";
+import {StorageService} from "@/infra/aws/storage/storage.service";
+import {TranscribeService} from "@/infra/aws/transcribe/transcribe.service";
 import castMimeMediaFormat from "@/core/utils/cast-mime-media-format";
 
 class TranscribeAudioHandler {
@@ -15,6 +15,7 @@ class TranscribeAudioHandler {
         const mediaFormat = castMimeMediaFormat(command.file.mimetype);
 
         const uploadFileResult = await this.storageService.upload({
+            folder: 'transcribe-input/',
             filename: command.file.originalname,
             contentType: mediaFormat,
             body: fileBuffer,

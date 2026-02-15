@@ -5,22 +5,25 @@ import {UploadFileCommand} from "@/infra/aws/commands/upload-file.command";
 import {UploadFileResult} from "@/infra/aws/commands/upload-file.result";
 import {Readable} from "node:stream";
 import {FilesUtils} from "@/infra/config";
+import {Defaults} from "@/core/defaults";
 // import {FilesUtils} from "@/core/utils/files.utils";
 
 export class StorageService {
+    private client: S3Client;
+
+    constructor() {
+        this.client = new S3Client();
+    }
+
     public async upload(
         file: UploadFileCommand
     ): Promise<UploadFileResult> {
         const region = process.env.AWS_REGION;
         const bucket = process.env.S3_BUCKET;
 
-        const s3 = new S3Client({
-            region
-        });
-
-        const key = `${file.keyPrefix ?? "transcribe-input"}/${file.filename}`;
+        const key = `${file.folder}${file.filename}`;
         const httpsUrl = `https://${bucket}.s3.${region}.amazonaws.com/${encodeURIComponent(key).replace(/%2F/g, "/")}`;
-        const s3Uri = `s3://${bucket}/${key}`;
+        const s3Uri = Defaults.S3_URI;
 
         const result = { key, httpsUrl, s3Uri };
 
@@ -41,7 +44,7 @@ export class StorageService {
             ContentType: file.contentType ?? "application/octet-stream",
         });
 
-        await s3.send(command);
+        await this.client.send(command);
 
         FilesUtils.deleteFile(localFilePath);
 
@@ -55,14 +58,14 @@ export class StorageService {
         const region = process.env.AWS_REGION;
         const bucket = process.env.S3_BUCKET;
 
-        const s3 = new S3Client({ region });
+        // const s3 = new S3Client({ region });
 
         const command = new GetObjectCommand({
             Bucket: bucket,
             Key: key,
         });
 
-        const response = await s3.send(command);
+        const response = await this.client.send(command);
 
         // Extract filename from key
         const filename = path.basename(key);
@@ -87,5 +90,54 @@ export class StorageService {
         });
 
         return localFilePath;
+    }
+
+    public async read(objectKey: string): Promise<any> {
+        return new Promise(async (resolve, reject) => {
+            const content = []
+            // const bucket = process.env.S3_BUCKET;
+
+            // const s3 = new S3Client();
+            // const s3 = new S3Client({ region });
+
+            const command = new GetObjectCommand({
+                Bucket: process.env.S3_BUCKET,
+                Key: objectKey
+            });
+
+            try {
+                const response = await this.client.send(command);
+                const body = response.Body;
+
+                if (body instanceof Readable) {
+                    // Process each chunk of data here (e.g., parse a line, count bytes)
+                    body.on('data', (chunk) => {
+                        // console.log(chunk.toString());
+                        // console.log(`Received chunk of size: ${chunk.length}`);
+                        content.push(chunk.toString());
+                    });
+
+                    body.on('end', () => {
+                        // console.log('Stream finished.');
+                        resolve(content.join(''));
+                    });
+
+                    body.on('error', (err) => {
+                        // console.error('Stream error:', err);
+                        reject(err);
+                    });
+                } else {
+                    // Handle the case where Body might not be a Readable stream (e.g., in a browser environment)
+                    // const str = await (body as any).transformToString(); // Use transformToString for the browser
+                    // console.log('Object content:', str);
+                    reject('Body is not a Readable stream')
+                }
+
+            } catch (err) {
+                console.error(err);
+                reject(err);
+            }
+        })
+        // const region = process.env.AWS_REGION;
     }
 }

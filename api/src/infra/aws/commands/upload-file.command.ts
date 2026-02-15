@@ -1,5 +1,5 @@
 export type UploadFileCommand = {
-    keyPrefix?: string;
+    folder: string;
     filename: string;
     contentType?: string;
     body: Buffer | Uint8Array | Blob | ReadableStream | any; // depende do seu runtime

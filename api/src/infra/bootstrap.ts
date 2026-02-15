@@ -1,7 +1,10 @@
 import './config'
 import {Server} from "./server";
+import {mongoConnection} from "@/infra/db/mongo/mongo-connection";
 
 export async function bootstrap() {
+    await mongoConnection.connect();
+
     const server = new Server();
     await server.init();
 }

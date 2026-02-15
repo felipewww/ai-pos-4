@@ -11,7 +11,6 @@ services:
     volumes:
       - ../api:/usr/src/app
     environment:
-      MONGO_URI: mongodb://admin:secret@mongodb:27017/comprehend-db?authSource=admin
       NODE_ENV: development
     depends_on:
       - comprehend-mongo
@@ -21,7 +20,7 @@ services:
 
   comprehend-mongo:
     image: mongo:latest
-    container_name: comprehend-mongodb
+    container_name: comprehend-mongo
     ports:
       - "27017:27017"
     environment:
