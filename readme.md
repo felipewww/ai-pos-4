@@ -23,9 +23,9 @@ O sistema integra:
   e aciona o backend para processamento do transcript.
 * 🗂️ **Amazon S3** – Armazenamento centralizado de artefatos do pipeline.
   Guarda áudios, transcrições geradas pelo Transcribe e arquivos de entrada/saída do Comprehend.
+* 🟢 **NestJS API + MongoDB** – Orquestração e persistência
 * 🧮 **Risk Engine (modelo local em Python)** – Classificação de risco
 * 🔁 **Human-in-the-Loop (HITL)** – Governança e validação humana
-* 🟢 **NestJS API + MongoDB** – Orquestração e persistência
 
 ---
 

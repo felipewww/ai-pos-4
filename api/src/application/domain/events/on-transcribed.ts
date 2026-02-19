@@ -34,7 +34,7 @@ export class OnTranscribed {
             const fileId = input.TranscriptionJobName;
             await this.transcribedRepository.save({
                 id: input.TranscriptionJobName,
-                status: ETranscriptionStatus.COMPLETED,
+                status: ETranscriptionStatus.TRANSCRIBED,
             })
 
             await this.saveToComprehend(fileId)

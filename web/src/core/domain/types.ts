@@ -1,5 +1,3 @@
-import mongoose, {Model, Schema} from "mongoose";
-
 export type Risk = {
     riskLevel: 'URGENTE' | 'ROTINA' | 'MONITORAR',
     confidence: number,
@@ -35,7 +33,7 @@ export type Predictions = {
 
 export enum ETranscriptionStatus {
     PROCESSING = 'PROCESSING',
-    TRANSCRIBED = 'TRANSCRIBED',
+    COMPLETED = 'COMPLETED',
     COMPREHEND_SUBMITTED = 'COMPREHEND_SUBMITTED',
     COMPREHEND_SUBMIT_FAILED = 'COMPREHEND_SUBMIT_FAILED',
     COMPREHEND_COMPLETED = 'COMPREHEND_COMPLETED',
@@ -44,30 +42,11 @@ export enum ETranscriptionStatus {
 
 export interface ITranscribedModel {
     id: string;
-    path: string;
-    filename: string;
+    path: string; // path for json transcribed
+    filename: string; //real audio file name uploaded
     status: ETranscriptionStatus;
-    comprehendJobId: string;
+    comprehendJobId?: string;
     predictions: Predictions;
-    risk: Risk;
-    content: string;
+    risk?: Risk;
+    // content: string;
 }
-
-const transcribedSchema: Schema = new Schema(
-    {
-        id: {type: String, required: true, unique: true},
-        path: {type: String, required: true},
-        filename: {type: String, required: true},
-        status: {type: String, required: true},
-        comprehendJobId: {type: String, required: false, nullable: true},
-        predictions: {type: Object, required: false, nullable: true},
-        risk: {type: Object, required: false, nullable: true},
-        content: {type: String, required: false, nullable: true}
-    },
-    {timestamps: true}
-);
-
-export const TranscribedEntity: Model<ITranscribedModel> = mongoose.model<ITranscribedModel>(
-    'transcribed',
-    transcribedSchema
-);

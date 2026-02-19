@@ -12,6 +12,7 @@ export const uploadMiddleware = multer({
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: (req, file, cb) => {
         const allowedMimes = ['audio/mpeg', 'audio/wave', 'audio/wav', 'audio/mp3', 'audio/mp4', 'audio/x-m4a'];
+
         if (allowedMimes.includes(file.mimetype)) {
             cb(null, true);
         } else {

@@ -8,7 +8,8 @@ export default function castMimeMediaFormat(mime: string) {
     }
 
     const map: { [key: string]: MediaFormat } = {
-        'audio/wave': 'wav'
+        'audio/wave': 'wav',
+        'audio/wav': 'wav',
     }
 
     const format = map[mime];

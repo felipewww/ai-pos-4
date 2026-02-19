@@ -13,7 +13,7 @@ export class ComprehendController {
         const router = express.Router();
 
         router.post('/', uploadMiddleware.single('file'), this.postAudio)
-        router.get('/:jobId', uploadMiddleware.single('file'), this.getComprehend)
+        router.get('/all', this.all)
         // router.post('/:jobId/analyze', uploadMiddleware.single('file'), this.forceComprehend)
 
         this.app.use('/comprehend', router)
@@ -28,7 +28,7 @@ export class ComprehendController {
         res.json(result)
     }
 
-    async getComprehend(req: Request, res: Response) {
+    async all(req: Request, res: Response) {
         const result = await searchComprehendHandler.run({
             filename: req.params.filename as string
         })

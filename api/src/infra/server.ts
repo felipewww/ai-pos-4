@@ -1,5 +1,5 @@
 import * as express from "express";
-// import cors from "cors";
+import * as cors from "cors";
 import {Express, Request, Response} from "express";
 
 import {ComprehendController} from "@/application/http/comprehend.controller";
@@ -9,12 +9,13 @@ import {EventsController} from "@/application/http/events.controller";
 export class Server {
     public app: Express;
 
+
     constructor() {
         this.app = express();
 
         this.app.use(express.json());
         this.app.use(express.urlencoded());
-        // this.app.use(cors());
+        this.app.use(cors());
         // this.app.use(RequestContext.use);
     }
 

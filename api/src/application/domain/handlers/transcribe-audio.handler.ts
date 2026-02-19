@@ -18,6 +18,7 @@ class TranscribeAudioHandler {
     ) {}
 
     async run(command: TranscribeAudioCommand) {
+        console.log('here??????????'.yellow.bold)
         try {
             const fileBuffer = await fs.readFile(command.file.path);
             const mediaFormat = castMimeMediaFormat(command.file.mimetype);

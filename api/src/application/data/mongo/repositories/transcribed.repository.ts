@@ -25,6 +25,10 @@ export class TranscribedRepository extends Mongo {
     async deleteById(id: string): Promise<void> {
         await TranscribedEntity.deleteOne({ id });
     }
+
+    async all(): Promise<ITranscribedModel[]> {
+        return TranscribedEntity.find();
+    }
 }
 
 export const transcribedRepository = new TranscribedRepository();
